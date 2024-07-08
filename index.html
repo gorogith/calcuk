@@ -26,6 +26,8 @@
             justify-content: center;
             cursor: pointer;
             user-select: none;
+            font-size: 24px;
+            color: white;
         }
         #score {
             font-size: 24px;
@@ -48,7 +50,7 @@
     </style>
 </head>
 <body>
-    <div id="gameArea">TAP</div>
+    <div id="gameArea">TAP ME</div>
     <div id="score">Score: 0</div>
     <div id="timer"><div id="timerBar"></div></div>
 
@@ -61,7 +63,7 @@
 
         gameArea.addEventListener('click', () => {
             if (canTap) {
-                score += 100;
+                score += 1;
                 scoreDisplay.textContent = `Score: ${score}`;
                 canTap = false;
                 gameArea.style.backgroundColor = '#ccc';
@@ -83,7 +85,7 @@
                     clearInterval(timer);
                     canTap = true;
                     gameArea.style.backgroundColor = '#4CAF50';
-                    gameArea.textContent = 'TAP';
+                    gameArea.textContent = 'TAP ME';
                     timerBar.style.width = '0%';
                 }
             }, 1000);
