@@ -3,112 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bump Game</title>
+    <title>Tap Game</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            margin: 0;
-            overflow: hidden;
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
+            margin: 0;
             background-color: #f0f0f0;
         }
-        #gameCanvas {
-            border: 1px solid black;
-            background-color: white;
+        #gameArea {
+            width: 300px;
+            height: 300px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        #score {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        #timer {
+            width: 300px;
+            height: 10px;
+            background-color: #ddd;
+            margin-top: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        #timerBar {
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 1s linear;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="300" height="400"></canvas>
+    <div id="gameArea">TAP</div>
+    <div id="score">Score: 0</div>
+    <div id="timer"><div id="timerBar"></div></div>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-
-        let player = {
-            x: canvas.width / 2,
-            y: canvas.height - 30,
-            radius: 15,
-            color: 'blue',
-            speed: 5
-        };
-
-        let targets = [];
         let score = 0;
+        let canTap = true;
+        const gameArea = document.getElementById('gameArea');
+        const scoreDisplay = document.getElementById('score');
+        const timerBar = document.getElementById('timerBar');
 
-        function createTarget() {
-            return {
-                x: Math.random() * (canvas.width - 20) + 10,
-                y: 0,
-                radius: 10,
-                color: 'red',
-                speed: Math.random() * 2 + 1
-            };
-        }
-
-        function drawCircle(x, y, radius, color) {
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        function drawScore() {
-            ctx.font = '16px Arial';
-            ctx.fillStyle = 'black';
-            ctx.fillText('Score: ' + score, 8, 20);
-        }
-
-        function update() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            drawCircle(player.x, player.y, player.radius, player.color);
-
-            if (Math.random() < 0.02) {
-                targets.push(createTarget());
+        gameArea.addEventListener('click', () => {
+            if (canTap) {
+                score += 100;
+                scoreDisplay.textContent = `Score: ${score}`;
+                canTap = false;
+                gameArea.style.backgroundColor = '#ccc';
+                gameArea.textContent = 'WAIT';
+                startTimer();
             }
+        });
 
-            for (let i = 0; i < targets.length; i++) {
-                let target = targets[i];
-                drawCircle(target.x, target.y, target.radius, target.color);
-                target.y += target.speed;
+        function startTimer() {
+            let timeLeft = 60;
+            timerBar.style.width = '100%';
 
-                let dx = player.x - target.x;
-                let dy = player.y - target.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
+            const timer = setInterval(() => {
+                timeLeft--;
+                const percentLeft = (timeLeft / 60) * 100;
+                timerBar.style.width = `${percentLeft}%`;
 
-                if (distance < player.radius + target.radius) {
-                    score++;
-                    targets.splice(i, 1);
-                    i--;
-                } else if (target.y > canvas.height) {
-                    targets.splice(i, 1);
-                    i--;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    canTap = true;
+                    gameArea.style.backgroundColor = '#4CAF50';
+                    gameArea.textContent = 'TAP';
+                    timerBar.style.width = '0%';
                 }
-            }
-
-            drawScore();
-            requestAnimationFrame(update);
+            }, 1000);
         }
-
-        document.addEventListener('mousemove', (event) => {
-            let rect = canvas.getBoundingClientRect();
-            player.x = event.clientX - rect.left;
-        });
-
-        document.addEventListener('touchmove', (event) => {
-            event.preventDefault();
-            let rect = canvas.getBoundingClientRect();
-            player.x = event.touches[0].clientX - rect.left;
-        });
 
         // Inisialisasi Telegram WebApp
         window.Telegram.WebApp.ready();
-        update();
     </script>
 </body>
 </html>
