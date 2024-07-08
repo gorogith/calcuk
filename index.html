@@ -68,7 +68,7 @@
                 score += 1;
                 scoreDisplay.textContent = `Score: ${score}`;
                 
-                if (score >= 100) {
+                if (score % 100 === 0) {
                     canTap = false;
                     gameArea.style.backgroundColor = '#ccc';
                     gameArea.textContent = 'WAIT';
@@ -79,7 +79,7 @@
         });
 
         function startTimer() {
-            let timeLeft = 60;
+            let timeLeft = 10;
             timerBar.style.width = '100%';
 
             const timerInterval = setInterval(() => {
