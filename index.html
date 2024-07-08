@@ -3,93 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tebak Angka</title>
+    <title>Bump Game</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             background-color: #f0f0f0;
         }
-        .game-container {
+        #gameCanvas {
+            border: 1px solid black;
             background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        input, button {
-            margin: 10px;
-            padding: 10px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        #message {
-            margin-top: 20px;
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>Tebak Angka</h1>
-        <p>Tebak angka antara 1 sampai 100:</p>
-        <input type="number" id="guess" min="1" max="100">
-        <button onclick="checkGuess()">Tebak</button>
-        <button onclick="resetGame()">Mulai Baru</button>
-        <p id="message"></p>
-        <p id="attempts"></p>
-    </div>
+    <canvas id="gameCanvas" width="300" height="400"></canvas>
 
     <script>
-        let targetNumber;
-        let attempts;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-        function initGame() {
-            targetNumber = Math.floor(Math.random() * 100) + 1;
-            attempts = 0;
-            document.getElementById('message').textContent = '';
-            document.getElementById('attempts').textContent = '';
-            document.getElementById('guess').value = '';
+        let player = {
+            x: canvas.width / 2,
+            y: canvas.height - 30,
+            radius: 15,
+            color: 'blue',
+            speed: 5
+        };
+
+        let targets = [];
+        let score = 0;
+
+        function createTarget() {
+            return {
+                x: Math.random() * (canvas.width - 20) + 10,
+                y: 0,
+                radius: 10,
+                color: 'red',
+                speed: Math.random() * 2 + 1
+            };
         }
 
-        function checkGuess() {
-            const guess = parseInt(document.getElementById('guess').value);
-            attempts++;
+        function drawCircle(x, y, radius, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.closePath();
+        }
 
-            if (isNaN(guess) || guess < 1 || guess > 100) {
-                document.getElementById('message').textContent = 'Masukkan angka antara 1 sampai 100!';
-                return;
+        function drawScore() {
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'black';
+            ctx.fillText('Score: ' + score, 8, 20);
+        }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawCircle(player.x, player.y, player.radius, player.color);
+
+            if (Math.random() < 0.02) {
+                targets.push(createTarget());
             }
 
-            if (guess === targetNumber) {
-                document.getElementById('message').textContent = `Selamat! Anda berhasil menebak angka ${targetNumber}!`;
-                document.getElementById('attempts').textContent = `Jumlah tebakan: ${attempts}`;
-            } else if (guess < targetNumber) {
-                document.getElementById('message').textContent = 'Terlalu rendah, coba lagi!';
-            } else {
-                document.getElementById('message').textContent = 'Terlalu tinggi, coba lagi!';
+            for (let i = 0; i < targets.length; i++) {
+                let target = targets[i];
+                drawCircle(target.x, target.y, target.radius, target.color);
+                target.y += target.speed;
+
+                let dx = player.x - target.x;
+                let dy = player.y - target.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < player.radius + target.radius) {
+                    score++;
+                    targets.splice(i, 1);
+                    i--;
+                } else if (target.y > canvas.height) {
+                    targets.splice(i, 1);
+                    i--;
+                }
             }
+
+            drawScore();
+            requestAnimationFrame(update);
         }
 
-        function resetGame() {
-            initGame();
-        }
+        document.addEventListener('mousemove', (event) => {
+            let rect = canvas.getBoundingClientRect();
+            player.x = event.clientX - rect.left;
+        });
 
-        // Inisialisasi Telegram WebApp dan Game
+        document.addEventListener('touchmove', (event) => {
+            event.preventDefault();
+            let rect = canvas.getBoundingClientRect();
+            player.x = event.touches[0].clientX - rect.left;
+        });
+
+        // Inisialisasi Telegram WebApp
         window.Telegram.WebApp.ready();
-        initGame();
+        update();
     </script>
 </body>
 </html>
