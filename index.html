@@ -40,6 +40,7 @@
             margin-top: 20px;
             border-radius: 5px;
             overflow: hidden;
+            display: none;
         }
         #timerBar {
             width: 0%;
@@ -59,16 +60,21 @@
         let canTap = true;
         const gameArea = document.getElementById('gameArea');
         const scoreDisplay = document.getElementById('score');
+        const timer = document.getElementById('timer');
         const timerBar = document.getElementById('timerBar');
 
         gameArea.addEventListener('click', () => {
             if (canTap) {
                 score += 1;
                 scoreDisplay.textContent = `Score: ${score}`;
-                canTap = false;
-                gameArea.style.backgroundColor = '#ccc';
-                gameArea.textContent = 'WAIT';
-                startTimer();
+                
+                if (score >= 100) {
+                    canTap = false;
+                    gameArea.style.backgroundColor = '#ccc';
+                    gameArea.textContent = 'WAIT';
+                    timer.style.display = 'block';
+                    startTimer();
+                }
             }
         });
 
@@ -76,16 +82,17 @@
             let timeLeft = 60;
             timerBar.style.width = '100%';
 
-            const timer = setInterval(() => {
+            const timerInterval = setInterval(() => {
                 timeLeft--;
                 const percentLeft = (timeLeft / 60) * 100;
                 timerBar.style.width = `${percentLeft}%`;
 
                 if (timeLeft <= 0) {
-                    clearInterval(timer);
+                    clearInterval(timerInterval);
                     canTap = true;
                     gameArea.style.backgroundColor = '#4CAF50';
                     gameArea.textContent = 'TAP ME';
+                    timer.style.display = 'none';
                     timerBar.style.width = '0%';
                 }
             }, 1000);
