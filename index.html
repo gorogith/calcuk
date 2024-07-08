@@ -3,85 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Sederhana</title>
+    <title>Tebak Angka</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
         }
-        .calculator {
+        .game-container {
             background-color: white;
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
         }
         input, button {
-            margin: 5px;
+            margin: 10px;
             padding: 10px;
-            font-size: 18px;
+            font-size: 16px;
         }
         button {
-            width: 40px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <input type="text" id="display" readonly>
-        <br>
-        <button onclick="appendToDisplay('7')">7</button>
-        <button onclick="appendToDisplay('8')">8</button>
-        <button onclick="appendToDisplay('9')">9</button>
-        <button onclick="appendToDisplay('+')">+</button>
-        <br>
-        <button onclick="appendToDisplay('4')">4</button>
-        <button onclick="appendToDisplay('5')">5</button>
-        <button onclick="appendToDisplay('6')">6</button>
-        <button onclick="appendToDisplay('-')">-</button>
-        <br>
-        <button onclick="appendToDisplay('1')">1</button>
-        <button onclick="appendToDisplay('2')">2</button>
-        <button onclick="appendToDisplay('3')">3</button>
-        <button onclick="appendToDisplay('*')">*</button>
-        <br>
-        <button onclick="appendToDisplay('0')">0</button>
-        <button onclick="appendToDisplay('.')">.</button>
-        <button onclick="calculate()">=</button>
-        <button onclick="appendToDisplay('/')">/</button>
-        <br>
-        <button onclick="clearDisplay()">C</button>
+    <div class="game-container">
+        <h1>Tebak Angka</h1>
+        <p>Tebak angka antara 1 sampai 100:</p>
+        <input type="number" id="guess" min="1" max="100">
+        <button onclick="checkGuess()">Tebak</button>
+        <button onclick="resetGame()">Mulai Baru</button>
+        <p id="message"></p>
+        <p id="attempts"></p>
     </div>
 
     <script>
-        function appendToDisplay(value) {
-            document.getElementById('display').value += value;
+        let targetNumber;
+        let attempts;
+
+        function initGame() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            document.getElementById('message').textContent = '';
+            document.getElementById('attempts').textContent = '';
+            document.getElementById('guess').value = '';
         }
 
-        function clearDisplay() {
-            document.getElementById('display').value = '';
-        }
+        function checkGuess() {
+            const guess = parseInt(document.getElementById('guess').value);
+            attempts++;
 
-        function calculate() {
-            try {
-                document.getElementById('display').value = eval(document.getElementById('display').value);
-            } catch (error) {
-                document.getElementById('display').value = 'Error';
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                document.getElementById('message').textContent = 'Masukkan angka antara 1 sampai 100!';
+                return;
+            }
+
+            if (guess === targetNumber) {
+                document.getElementById('message').textContent = `Selamat! Anda berhasil menebak angka ${targetNumber}!`;
+                document.getElementById('attempts').textContent = `Jumlah tebakan: ${attempts}`;
+            } else if (guess < targetNumber) {
+                document.getElementById('message').textContent = 'Terlalu rendah, coba lagi!';
+            } else {
+                document.getElementById('message').textContent = 'Terlalu tinggi, coba lagi!';
             }
         }
 
-        // Inisialisasi Telegram WebApp
+        function resetGame() {
+            initGame();
+        }
+
+        // Inisialisasi Telegram WebApp dan Game
         window.Telegram.WebApp.ready();
+        initGame();
     </script>
 </body>
 </html>
