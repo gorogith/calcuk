@@ -5,50 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tap Game</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        #gameArea {
-            width: 300px;
-            height: 300px;
-            background-color: #4CAF50;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            user-select: none;
-            font-size: 24px;
-            color: white;
-        }
-        #score {
-            font-size: 24px;
-            margin-top: 20px;
-        }
-        #timer {
-            width: 300px;
-            height: 10px;
-            background-color: #ddd;
-            margin-top: 20px;
-            border-radius: 5px;
-            overflow: hidden;
-            display: none;
-        }
-        #timerBar {
-            width: 0%;
-            height: 100%;
-            background-color: #4CAF50;
-            transition: width 1s linear;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+        
 </head>
 <body>
     <div id="gameArea">TAP ME</div>
@@ -84,7 +42,7 @@
 
             const timerInterval = setInterval(() => {
                 timeLeft--;
-                const percentLeft = (timeLeft / 60) * 100;
+                const percentLeft = (timeLeft / 10) * 100;
                 timerBar.style.width = `${percentLeft}%`;
 
                 if (timeLeft <= 0) {
